@@ -1,25 +1,34 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class CollisionHandler : MonoBehaviour
 {
     [SerializeField] float levelLoadDelay = 3f;
-    [SerializeField] AudioClip crash;
-    [SerializeField] AudioClip success;
+    [SerializeField] AudioClip crashSFX;
+    [SerializeField] AudioClip successSFX;
+    [SerializeField] ParticleSystem crashParticles;
+    [SerializeField] ParticleSystem successParticles;
 
     AudioSource audioSource;
 
     bool isControllable = true;
+    bool isCollidable = true;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
     }
 
+    void Update()
+    {
+        RespondToDebugKeys();
+    }
+
     void OnCollisionEnter(Collision collision)
     {
-        if(!isControllable)
+        if(!isControllable || !isCollidable)
         {
             return;
         }
@@ -44,18 +53,28 @@ public class CollisionHandler : MonoBehaviour
     void StartCrashSequence()
     {
         isControllable = false;
+
         audioSource.Stop();
-        audioSource.PlayOneShot(crash);
+        audioSource.PlayOneShot(crashSFX);
+
+        crashParticles.Play();
+
         GetComponent<Movement>().enabled = false;
+
         Invoke("ReloadLevel", levelLoadDelay);
     }
 
     void StartSuccessSequence()
     {
         isControllable = false;
+
         audioSource.Stop();
-        audioSource.PlayOneShot(success);
+        audioSource.PlayOneShot(successSFX);
+
+        successParticles.Play();
+
         GetComponent<Movement>().enabled = false;
+
         Invoke("LoadNextLevel", levelLoadDelay);
     }
 
@@ -77,4 +96,18 @@ public class CollisionHandler : MonoBehaviour
         }
         SceneManager.LoadScene(nextScene);
     }
+        
+    void RespondToDebugKeys()
+    {
+        if(Keyboard.current.lKey.wasPressedThisFrame)
+        {
+            LoadNextLevel();
+        }
+        else if (Keyboard.current.cKey.wasPressedThisFrame)
+        {
+            isCollidable = !isCollidable;
+            
+        }
+    }
+
 }
