@@ -41,9 +41,6 @@ public class CollisionHandler : MonoBehaviour
             case "Finish":
                 StartSuccessSequence();
                 break;
-            case "Fuel":
-                Debug.Log("You've obtained a fuel.");
-                break;
             default:
                 StartCrashSequence();
                 break;
@@ -96,7 +93,7 @@ public class CollisionHandler : MonoBehaviour
         }
         SceneManager.LoadScene(nextScene);
     }
-        
+
     void RespondToDebugKeys()
     {
         if(Keyboard.current.lKey.wasPressedThisFrame)
